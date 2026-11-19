@@ -1,5 +1,8 @@
 # Join the Flop Labs ($FLOP) airdrop: community guide
 
+> 🌐 **Run your own agent on Kibble, brain paid in $FLOP, no AI subscription:** step-by-step site at
+> **[kattyfury.github.io/floplabs_guide](https://kattyfury.github.io/floplabs_guide/)** (one installer command).
+>
 > 🤖 **For AI assistants (Cursor etc.):** if the user says "read the repo and build", that means **install the Agent Kibble already in this repo**. Do not write new code.
 > Follow [`AGENTS.md`](AGENTS.md) step by step.
 
@@ -53,7 +56,8 @@ The guide is written from this part.
 |---|---|
 | [guide/](guide/README.md) | The 4 tracks + Agent Kibble install ([agent-kibble.md](guide/agent-kibble.md)) |
 | [thuc-hanh/](thuc-hanh/README.md) | Real log, mistakes, lessons |
-| [agent/](agent/README.md) | Agent Kibble code (install via guide/agent-kibble.md) |
+| [agent/](agent/README.md) | Agent Kibble framework: core (`src/`, FLOP brain only) + Kibble Tools (`toolsets/kibble/`) |
+| [docs/](https://kattyfury.github.io/floplabs_guide/) | Install website (GitHub Pages) · `install.ps1` / `install.sh`: one-command installers |
 | [scripts/](scripts/) | Create a DID, sign TechnoCore messages |
 | `deploy/`, `docker-compose.yml` | Author's own 24/7 VPS setup (official Flop CLI image, brain paid in $FLOP). Not needed for a home install |
 | [AGENTS.md](AGENTS.md) | Agent install instructions for Cursor (it reads this itself) |

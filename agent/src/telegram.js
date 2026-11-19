@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { AGENT_DIR } from "./env.js";
-import { loadMemory, dayOf } from "./agent.js";
+import { loadMemory, dayOf } from "./memory.js";
 import * as kibble from "./kibble.js";
 
 const STATE_FILE = path.join(AGENT_DIR, "data", "bot.json"); // bot owner, paused, date last reported
@@ -71,10 +71,13 @@ export async function statusText(cfg, id) {
     `🪪 ${id.did.slice(0, 16)}…${id.did.slice(-6)}`,
     `🏆 Điểm Kibble: ${s.score}${s.rank ? ` · hạng ${s.rank}` : ""}`,
     `📦 Hôm nay: nộp ${day.results} bài · chấm ${day.attests} bài · ${day.sessions} vòng`,
-    `🔋 Token: ${day.tokens.toLocaleString("en")} / ${L.daily_tokens.toLocaleString("en")} · ≈$${day.cost.toFixed(4)} theo giá niêm yết`,
-    `⚡ FLOP đã tiêu cho compute: ${(day.flop || 0).toFixed(3)} / ${L.daily_flop || "∞"}`,
+    `🔋 Token: ${day.tokens.toLocaleString("en")} / ${L.daily_tokens.toLocaleString("en")}`,
+    `⚡ FLOP đã tiêu cho compute: ${(day.flop || 0).toFixed(3)} / ${L.daily_flop}`,
+    state().blocked ? `⏸️ Não FLOP chưa sẵn sàng: ${state().blocked}` : "",
     state().paused ? "⏸️ Đang tạm dừng (/resume để chạy lại)" : "▶️ Đang chạy",
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 // Daily report: sent when the day's token budget runs out, or at 7 AM next day (00:00 UTC) if it stopped early.
@@ -93,7 +96,7 @@ export async function dailyReport(tg, id, date, why = "") {
     [
       `📊 Báo cáo ngày ${date}`,
       `📦 Nộp ${d.results || 0} bài · ✍️ chấm ${d.attests || 0} bài (${useful} useful / ${judged.length - useful} not)`,
-      `🔋 ${(d.tokens || 0).toLocaleString("en")} token · ${d.sessions || 0} vòng · ≈$${(d.cost || 0).toFixed(4)} theo giá niêm yết · ⚡ ${(d.flop || 0).toFixed(3)} FLOP`,
+      `🔋 ${(d.tokens || 0).toLocaleString("en")} token · ${d.sessions || 0} vòng · ⚡ ${(d.flop || 0).toFixed(3)} FLOP`,
       `🏆 Điểm Kibble hiện tại: ${s.score}${s.rank ? ` · hạng ${s.rank}` : ""}`,
       why ? `😴 ${why} Mai chạy tiếp.` : "",
     ]

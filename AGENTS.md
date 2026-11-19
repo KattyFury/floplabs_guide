@@ -1,6 +1,7 @@
-# AGENTS.md: for AI (Cursor) installing Agent Kibble for the user
+# AGENTS.md: for AI assistants (Cursor etc.) helping a user install Agent Kibble
 
-The user sends this repo link with something like "read the repo and build it for me" / "đọc repo rồi build cho tôi" / "install the agent" → follow the steps below exactly.
+The user sends this repo link with something like "read the repo and build it for me" / "đọc repo rồi build cho tôi" / "install the agent" → follow the steps below.
+An AI assistant is **optional**: the same steps work by hand from https://kattyfury.github.io/floplabs_guide/.
 
 ⚠️ "Build" here means INSTALL the agent ALREADY in this repo. It does NOT mean writing a new agent. Do not write code or create a new project.
 
@@ -11,39 +12,30 @@ The user sends this repo link with something like "read the repo and build it fo
 
 ## Rules
 
-- The agent in `agent/` is finished and runs in production. Your ONLY job is to install and test it.
-  Do NOT rewrite / refactor / edit `agent/src/`, install libraries, or run `npm install`.
-- Do not read the whole repo. You only need `agent/README.md`, `agent/.env.example`, `agent/config.json`.
-  Skip `docs/`, `guide/` (except `guide/agent-kibble.md`), `thuc-hanh/`.
-- Keys and tokens: the user pastes them into `agent/.env` THEMSELVES. Never ask for them in chat and never print their values.
-- Do NOT open or read files in `secrets/`. Do NOT commit, push, or edit `.gitignore`.
-- Each `node agent/thu-1-phien.js` does 1 real job on Kibble with the user's DID → run it only once.
+- The agent in `agent/` is finished. Your ONLY job is to install and test it.
+  Do NOT rewrite / refactor / edit `agent/src/` or `agent/toolsets/`, install libraries, or run `npm install`.
+- **The brain is FLOP compute only.** Never add or suggest OpenAI, Claude, Gemini, Ollama or any other AI provider or key.
+  If FLOP is not ready (no gateway key, or no model passes the self-test), that is expected: the agent waits and posts nothing.
+- Do not read the whole repo. You only need `agent/README.md`, `agent/.env.example`, `agent/config.json`, `guide/agent-kibble.md`.
+- Keys and tokens: the user types them into the installer or `agent/.env` THEMSELVES. Never ask for them in chat and never print their values.
+- Do NOT open or read files in `secrets/` or `~/.flop/`. Do NOT commit, push, or edit `.gitignore`.
 
 ## Steps (in order)
 
-0. Get the repo (if the workspace is not this repo yet):
-   - Check Git: `git --version`. Missing → guide the user to install Git for Windows from git-scm.com (keep clicking Next),
-     then reopen Cursor.
-   - Open folder is empty → `git clone https://github.com/KattyFury/floplabs_guide.git .`
-     (the trailing dot clones right here). Not empty → clone into a `floplabs_guide` subfolder
-     and run EVERY later command there.
-   - Read this `AGENTS.md` in the fresh clone, then continue from step 1.
-1. Check Node.js: `node -v`. Missing or below 20 → guide the user through installing the LTS from nodejs.org, click by click.
-2. Guide the user to get an OpenAI key: platform.openai.com → Billing, top up $6 (not $5: the extra keeps the balance from dropping below $5 if a few cents get charged past the free tier) → Data controls → Sharing, turn on data sharing
-   (2.5M free tokens/day; state clearly that OpenAI may train on the data) → API keys → Create new secret key.
-3. Guide the user to create a Telegram bot: @BotFather → `/newbot` → display name → username ending in `bot` → copy the token.
-4. DID (the agent's identity): if `data/` has no `<name>.json` for this user → ask for one short name without diacritics →
-   `node scripts/generate-did.js <name>`. If one exists, do NOT create another (one DID per person).
-   Remind the user to back up `secrets/` + `data/<name>.json` to USB NOW. Lost means the identity is gone for good.
-5. Copy `agent/.env.example` to `agent/.env` (keep it if it exists). Set `DID_LABEL=<name>`.
-   Tell the user to paste the OpenAI key into `OPENAI_API_KEY=` and the token into `TELEGRAM_BOT_TOKEN=` THEMSELVES, then save.
-6. Test exactly once: `node agent/thu-1-phien.js`
-   - A `💸` line → OK.
-   - A `❌` → explain in plain words and fix using the "When something fails" table in `agent/README.md`.
-7. Tell the user to double-click `agent/CAI-TU-CHAY.bat` → the agent runs in the background whenever the PC is on (PC off = agent rests).
-8. Tell the user to open the bot on Telegram → `/start` → `/status`. The first person to message becomes the bot owner.
-9. Finish with this checklist:
+1. Node.js: `node -v`. Missing or below 22 → guide the user to install the LTS from nodejs.org (or `winget install OpenJS.NodeJS.LTS`), then open a new terminal.
+2. Telegram bot: @BotFather → `/newbot` → display name → username ending in `bot` → copy the token (the user keeps it for the installer).
+3. Tell the user to run the installer **in their own terminal** (it asks questions):
+   - Windows PowerShell: `irm https://raw.githubusercontent.com/KattyFury/floplabs_guide/master/install.ps1 | iex`
+   - macOS/Linux: `curl -fsSL https://raw.githubusercontent.com/KattyFury/floplabs_guide/master/install.sh -o install.sh && bash install.sh`
+   It creates the DID, the FLOP devnet wallet + gateway key (official `@flop-labs/cli`), `agent/.env`, and tests the brain.
+4. Remind the user to back up `secrets/`, `data/<name>.json` and `~/.flop/` to USB NOW. Lost = identity and wallet gone for good.
+5. Explain the result of step [6/6]:
+   - `✅ … đạt bài thử dùng tool` → the brain is ready.
+   - `⏸️ …` → not ready yet (no key, enrollment cap, or the FLOP model failed the tool test). Normal today; the agent re-checks by itself.
+   Use the "When something fails" table in `agent/README.md`.
+6. The user answers Y to start in the background, then opens the bot on Telegram → `/start` → `/status`. The first person to message becomes the owner.
+7. Finish with this checklist:
    - [ ] `/status` replies on Telegram
-   - [ ] User knows: PC on = agent runs, PC off = rests, 1 report daily at 7 AM; a plain question to the bot posts a job on Kibble (only after tapping ✅ Đăng)
-   - [ ] DID backed up to USB
-   - [ ] `agent/.env` and `secrets/` shared with no one and not committed to GitHub
+   - [ ] User knows: computer on = agent runs, off = rests; 1 report daily at 7 AM; it posts nothing while the FLOP brain isn't ready
+   - [ ] DID and `~/.flop/` backed up to USB
+   - [ ] `agent/.env`, `secrets/`, `~/.flop/` shared with no one and not on GitHub

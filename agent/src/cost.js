@@ -1,4 +1,4 @@
-// Log tokens + money per brain call, so "why did it cost this" can always be answered.
+// Log tokens + FLOP per brain call, so "why did it cost this" can always be answered.
 import fs from "node:fs";
 import path from "node:path";
 import { AGENT_DIR } from "./env.js";
@@ -10,44 +10,34 @@ export function startRun(label) {
   run = { label, started: Date.now(), calls: [] };
 }
 
-export function recordCall(stage, model, usage, cost, tools) {
-  const call = { stage, model, ...usage, cost: +cost.toFixed(6), flop: +(tools?.flop || 0).toFixed(6), brain: tools?.brain };
+export function recordCall(stage, model, usage, flop = 0) {
+  const call = { stage, model, ...usage, flop: +flop.toFixed(6) };
   if (run) run.calls.push(call);
+  else logLine({ time: new Date().toISOString(), label: stage, flop: call.flop, calls: [call] }); // one-off call (self-test, draft)
+}
+
+function logLine(obj) {
+  fs.mkdirSync(LOG_DIR, { recursive: true });
+  fs.appendFileSync(path.join(LOG_DIR, "cost.jsonl"), JSON.stringify(obj) + "\n");
 }
 
 export function endRun(extra = {}) {
   if (!run) return null;
-  const total = run.calls.reduce((s, c) => s + c.cost, 0);
   const summary = {
     time: new Date().toISOString(),
     label: run.label,
     seconds: Math.round((Date.now() - run.started) / 1000),
-    cost_usd: +total.toFixed(5),
-    flop: +run.calls.reduce((s, c) => s + (c.flop || 0), 0).toFixed(5),
+    flop: +run.calls.reduce((s, c) => s + (c.flop || 0), 0).toFixed(6),
     calls: run.calls,
     ...extra,
   };
-  fs.mkdirSync(LOG_DIR, { recursive: true });
-  fs.appendFileSync(path.join(LOG_DIR, "cost.jsonl"), JSON.stringify(summary) + "\n");
+  logLine(summary);
   run = null;
   return summary;
 }
 
 export function costLine(s) {
   const tok = s.calls.reduce((a, c) => a + c.input + c.output + c.reasoning, 0);
-  const brains = [...new Set(s.calls.map((c) => c.brain).filter(Boolean))].join("+");
-  return `💸 ${s.calls.length} lần gọi não${brains ? ` (${brains})` : ""} · ${tok.toLocaleString("en")} token · ≈$${s.cost_usd} · ⚡ ${s.flop || 0} FLOP · ${s.seconds}s`;
-}
-
-export function todayTotal() {
-  const file = path.join(LOG_DIR, "cost.jsonl");
-  if (!fs.existsSync(file)) return { runs: 0, usd: 0 };
-  const day = new Date().toISOString().slice(0, 10);
-  let runs = 0, usd = 0;
-  for (const line of fs.readFileSync(file, "utf8").split("\n")) {
-    if (!line.startsWith(`{"time":"${day}`)) continue;
-    runs++;
-    usd += JSON.parse(line).cost_usd;
-  }
-  return { runs, usd: +usd.toFixed(4) };
+  const models = [...new Set(s.calls.map((c) => c.model).filter(Boolean))].join("+");
+  return `💸 ${s.calls.length} lần gọi não FLOP${models ? ` (${models})` : ""} · ${tok.toLocaleString("en")} token · ⚡ ${s.flop || 0} FLOP · ${s.seconds}s`;
 }

@@ -59,4 +59,5 @@ The faucet site also offers proof-of-personhood (Passport, BrightID...) for larg
 
 [Kibble](https://kibble.world) is a community-built job market for agents on TechnoCore (Flop's agent hub).
 Kibble points **do not count for the airdrop**, but it is real practice for your agent and you will have a DID ready when testnet opens on **2026-11-24**.
-Install guide for the sample background agent, with Cursor doing the work: **[agent-kibble.md](agent-kibble.md)**.
+Install the sample background agent (brain on FLOP compute only, one installer command, no AI subscription):
+**[kattyfury.github.io/floplabs_guide](https://kattyfury.github.io/floplabs_guide/)** · text version: [agent-kibble.md](agent-kibble.md).

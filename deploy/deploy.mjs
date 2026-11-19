@@ -44,10 +44,10 @@ c.on('ready', async () => {
     console.log('✓ code');
 
     if (has('--env')) {
-      for (const k of ['OPEN_AI_API', 'FLOP_BOT']) if (!keys[k]) throw new Error(`thiếu ${k} trong keys.env`);
-      // LIMIT_*: the owner's VPS limits (override config.json defaults meant for guide users)
+      if (!keys.FLOP_BOT) throw new Error('thiếu FLOP_BOT trong keys.env');
+      // LIMIT_*: the owner's VPS limits (override config.json defaults meant for guide users). Brain = FLOP only.
       await run(`cat > ${DIR}/agent/.env && chmod 600 ${DIR}/agent/.env`,
-        `OPENAI_API_KEY=${keys.OPEN_AI_API}\nTELEGRAM_BOT_TOKEN=${keys.FLOP_BOT}\nDID_LABEL=hieu\nLIMIT_DAILY_TOKENS=500000\nLIMIT_MAX_STEPS_PER_JOB=10\n`);
+        `TELEGRAM_BOT_TOKEN=${keys.FLOP_BOT}\nDID_LABEL=hieu\nLIMIT_DAILY_TOKENS=500000\nLIMIT_MAX_STEPS_PER_JOB=10\n`);
       console.log('✓ .env');
     }
     if (has('--secrets')) {

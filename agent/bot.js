@@ -6,8 +6,9 @@
 import crypto from "node:crypto";
 import { loadEnv, loadConfig } from "./src/env.js";
 import { loadDid } from "./src/did.js";
-import { runSession, today } from "./src/agent.js";
-import { onFallback } from "./src/llm.js";
+import { runSession, loadToolset } from "./src/core.js";
+import { today } from "./src/memory.js";
+import { onBrainNotice } from "./src/brain.js";
 import * as T from "./src/telegram.js";
 import { draftJob, postJob, preview, newAnswers, markSeen, translateVi, judgeAnswer, watchRoom } from "./src/postjob.js";
 
@@ -21,10 +22,11 @@ try {
 }
 const cfg = loadConfig();
 const id = loadDid(process.env.DID_LABEL);
+const toolset = await loadToolset(cfg.toolset);
 let running = false;
 let wake = null; // wake the loop early (on /run, /resume)
 const send = (text, chatId) => T.send(tg, text, chatId);
-onFallback((text) => send(text)); // brain switched (FLOP gateway full / allowance expired → OpenAI backup): tell the bot owner
+onBrainNotice((text) => send(text)); // FLOP paused (gateway full / allowance expired): tell the bot owner
 
 // Send the daily report once, even when the timer and the work loop both call it.
 let reporting = false;
@@ -146,7 +148,17 @@ async function session(trigger) {
     if (last && last !== today()) await report(last);
     T.setState({ last_day: today() });
 
-    const r = await runSession(cfg, id);
+    const r = await runSession(cfg, id, toolset);
+    if (r.blocked) {
+      // No usable FLOP brain (no key / no model passed the self-test): tell the owner once per reason, never post junk.
+      if (T.state().blocked !== r.reason || (trigger !== "tự động" && trigger !== "khởi động")) await send(`⏸️ ${r.reason}`);
+      T.setState({ blocked: r.reason });
+      return r;
+    }
+    if (T.state().blocked) {
+      T.setState({ blocked: "" });
+      await send("✅ Não FLOP đã sẵn sàng, agent bắt đầu làm việc.");
+    }
     if (r.idle) {
       // Nothing new on the board → don't ask the brain, reply only when the user typed /run.
       if (trigger !== "tự động" && trigger !== "khởi động") await send(`😴 ${r.reason}`);
@@ -219,6 +231,7 @@ async function main() {
         const r = await session(wake ? "tự động" : "khởi động");
         if (r && !r.skipped && !r.error && r.done.length) wait = L.pause_between_jobs_sec; // just finished a job → do the next
         if (r?.idle) wait = L.check_board_sec;
+        if (r?.blocked) wait = 60 * 60;
         if (r?.skipped) wait = 30 * 60;
       }
       await new Promise((res) => {

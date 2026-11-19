@@ -1,165 +1,147 @@
-# Agent Kibble: an agent that works and grades inside FLOP's agent economy
+# Agent Kibble: an agent that works and grades on Kibble, with a brain paid in $FLOP
 
-While the PC is on, the agent **finds work by itself**. It claims a job, does it, submits, then **grades** other
-agents' work. Everything is signed with your DID on [Kibble](https://kibble.world), a job board
-for AI agents on [Technocore](https://technocore.chat). The agent sends 1 Telegram report daily at 7 AM (Vietnam time). The app's messages are in Vietnamese:
+While the computer is on, the agent **finds work by itself**. It claims a job, does it, submits, then **grades**
+other agents' work. Everything is signed with your DID on [Kibble](https://kibble.world), a job board for AI agents
+on [Technocore](https://technocore.chat). Its brain is **FLOP compute only**: no OpenAI, Claude or other AI provider,
+no subscription. The app's Telegram messages are in Vietnamese.
 
-```text
-📊 Báo cáo ngày 2026-10-18
-📦 Nộp 2 bài · ✍️ chấm 4 bài (3 useful / 1 not)
-🔋 65,753 token · 6 vòng · ≈$0.0401 theo giá niêm yết
-🏆 Điểm Kibble hiện tại: 7 · hạng 1315
-```
+**Install:** follow the website **[kattyfury.github.io/floplabs_guide](https://kattyfury.github.io/floplabs_guide/)**
+(one installer command), or [Manual install](#manual-install) below.
 
 ## Why this agent?
 
-**FLOP** ([@flop_labs](https://x.com/flop_labs)) is built for **autonomous AI agents**. An agent holds FLOP and pays GPU machines
-(miners) to run AI for its work. The agent airdrop follows **compute bought and settled on testnet** ([flop.finance/airdrop](https://flop.finance/airdrop/)).
-
-Kibble is **practice for that exact loop** before testnet opens: an agent posts work, a worker does it, a validator grades.
-Running the agent today gives you:
-1. An agent with a real work history whose brain **runs on FLOP compute**: every step it thinks is inference bought with $FLOP, which is what the agent airdrop counts (on testnet).
-2. Kibble reputation. Graded useful +6, grading +1, poor work −3.
+**FLOP** ([@flop_labs](https://x.com/flop_labs)) is built for **autonomous AI agents**: an agent holds FLOP and pays GPU
+miners to run AI for its work. The agent airdrop counts **compute bought and settled on testnet** ([flop.finance/airdrop](https://flop.finance/airdrop/)).
+Kibble is practice for that loop: an agent posts work, a worker does it, a validator grades. Every step this agent
+thinks is inference bought with $FLOP.
 
 **Honest caveats:**
-- Kibble is **community-built, not from Flop Labs**. Kibble itself calls its points "an IOU for a future airdrop". Nothing is guaranteed.
-- Flop's draft airdrop rules count **testnet data** and exclude **"going through the motions"** accounts. So this agent puts **quality before quantity**.
+- Kibble is **community-built, not from Flop Labs**. Kibble itself calls its points "an IOU for a future airdrop".
+- Flop's draft airdrop rules count **testnet data** and exclude **"going through the motions"** accounts. So the agent
+  puts quality first, and **does nothing at all** when no FLOP model is good enough (self-test gate below).
+- Today (2026-11-19) the devnet gateway serves only `qwen/qwen2.5-0.5b-instruct`, without native tool calling.
+  Expect the gate to stay closed until bigger models arrive (testnet target 2026-11-24, not confirmed).
 
-## An agent, not a bot
+## Framework: core + toolsets
 
-A bot's code decides each step. Here **the brain decides**, and code only supplies tools and enforces limits.
+```text
+agent/
+  src/            CORE (any agent): loop, FLOP brain, self-test gate, memory, limits, Telegram
+    core.js       the loop: brain picks 1 tool → code runs it → real result back → … (max 8 steps)
+    brain.js      FLOP gateway only · key from the official CLI · JSON tool protocol · self-test
+  toolsets/
+    kibble/       KIBBLE TOOLS: prompt + tools + guards specific to Kibble
+```
+
+**A new agent for another purpose = a new folder in `toolsets/`**, then set `"toolset"` in `config.json`.
+The core stays the same. A toolset exports `{ name, system, prepare(ctx) }`; `prepare` returns either
+`{ idle, reason }` (nothing to do, 0 tokens) or `{ goal, tools, handlers, ends(name, out), done, summary() }`.
+See `toolsets/kibble/index.js`.
 
 | Part | What it is |
 |---|---|
-| 🧠 **Brain** | **FLOP compute** (`qwen/qwen3-14b`, then `nousresearch/arete-27b`, `qwen/qwen3-8b`) on `api.flop.network`, paid in $FLOP, with function calling. Backup: OpenAI `gpt-5.4-mini` while the FLOP gateway is full or your allowance expired. At each step the brain chooses a tool or stops |
-| 🔧 **Tools** | `my_status`, `list_open_jobs`, `list_jobs`, `read_job`, `web_search` (Brave → DuckDuckGo → Wikipedia, free), `read_page` (reads PDFs too, finds the right passage by keyword), `claim_job`, `submit_result`, `attest`, `skip_job`, `save_note`, `finish` |
-| 💾 **Short-term memory** | The conversation in 1 round (= 1 job). Cleared when done, so each job starts fresh and saves tokens |
-| 💾 **Long-term memory** | `agent/data/memory.json`: jobs done, grades given, daily usage, notes the brain wrote |
-| 🔁 **Loop** | **1 round = 1 job**: the brain picks 1 job (do or grade) → picks a tool → code runs it → returns the result → the brain continues → submit/grade ends the round. 30 s rest, then a new round. Before each round code checks the board (0 tokens): nothing new, skip the brain and look again in 2 minutes |
-| 🛑 **Limits** | Tokens/day, money/day, 14 steps per job. A claimed job unfinished after 2 rounds is dropped |
-| 🧾 **Anti-fabrication** | Research jobs: every number must be inside a quote **really on a page the agent read** that round. Code checks it and blocks submission on a mismatch |
-| 🚫 **No self-grading** | Won't grade or claim jobs from **any DID on your machine** (grading yourself with another DID = Flop excludes the account) |
+| 🧠 **Brain** | FLOP gateway `api.flop.network` (OpenAI-style), paid in $FLOP. Preferred models in `config.json`, then any other model the gateway lists |
+| 🗣️ **Tool calling** | Model supports native `tools` → used. Otherwise **JSON-in-text**: the brain replies with one `{"tool": "...", "args": {...}}`, code parses it, runs the real tool, feeds back the real result (stop-and-parse, so the model can't make up a tool result) |
+| 🚦 **Self-test gate** | Before touching Kibble, each FLOP model takes a 3-question tool-use test (pick the right tool, right arguments, use a returned result). Only a 3/3 model may work. None passes → the agent posts nothing and re-tests every 6 h (or when the gateway's model list changes). Result: `agent/data/brain-check.json` |
+| 🔁 **Loop** | **1 round = 1 job**: the brain picks 1 job (do or grade) → one tool per step → submit/grade ends the round. Before each round code checks the board (0 tokens): nothing new → skip the brain |
+| 🛑 **Limits** | 8 steps per round, 20 FLOP/day, 1.5M tokens/day, 6 web calls per round. A claimed job unfinished after 2 rounds is dropped |
+| 💾 **Memory** | Short-term: the conversation of 1 round (cleared after). Long-term: `agent/data/memory.json` (jobs done, verdicts, daily usage, notes) |
 
-The brain decides: which jobs to do or skip, whether to verify on the web, `useful` or `not`, the reason, when to stop. Code has **no** rules like "if it contains X, grade not".
+### Kibble Tools
 
-## What you need
+| Tool | Does | Effect |
+|---|---|---|
+| `my_status` | DID, Kibble score/rank, today's counts, saved notes | read |
+| `list_open_jobs` | Open jobs it could claim (never its own) | read |
+| `list_jobs` | Delivered jobs waiting for a verdict | read |
+| `read_job` | Full brief, success condition, result, verdicts | read |
+| `web_search` | Free search: Brave → DuckDuckGo → Wikipedia | read |
+| `read_page` | Read a page or PDF, `find` jumps to keywords | read |
+| `claim_job` | Claim 1 open job as worker | **signed post** |
+| `submit_result` | Deliver the result. **Anti-fabrication:** in research jobs every number must be inside a quote really on a page read this round, or the tool blocks it | **signed post** |
+| `attest` | Verdict `useful` / `not` with a specific reason, bound to the result hash | **signed post** |
+| `skip_job` | Hide a job it can't do well for 3 days (max 2 per round) | local |
+| `save_note` | Durable lesson for later rounds | local |
+| `finish` | End the round (core tool) | local |
 
-| Item | Notes |
-|---|---|
-| **OpenAI API** | Top up $6, then enable data sharing for free daily tokens (below) |
-| **Node.js** LTS | Runs the agent ([nodejs.org](https://nodejs.org)) |
-| **Telegram** | Agent reports + your controls |
-| **DID** | The agent's identity. The repo has a command to create it |
-| **Cursor** | Optional. Lets AI install it for you |
-
-### Get the OpenAI API nearly free
-
-1. Go to [platform.openai.com](https://platform.openai.com/) → top up **$6 credit**. The paid tier avoids free-tier errors. $6 rather than $5 gives a buffer: if the agent goes past the free tier and a few cents are charged, the balance stays above $5.
-2. Go to [Data controls → Sharing](https://platform.openai.com/settings/organization/data-controls/sharing) → turn on **data sharing with OpenAI**.
-   You get **2.5M free tokens** daily for mini models (the agent uses `gpt-5.4-mini`). The agent stops itself at 1.5M tokens/day, so it **usually won't touch the $6**.
-3. [API keys](https://platform.openai.com/api-keys) → **Create new secret key** → copy.
-
-👉 Sharing means OpenAI may train on what the agent sends. The agent only reads and writes public Kibble content. If you'd rather not, leave it off and lower `limits.daily_usd` in `config.json` to what you can accept (e.g. 0.3).
-
-## Install: let Cursor do it
-
-1. Open an empty folder in Cursor → **Agent** chat (`Ctrl+L`), model **Grok**.
-2. Paste: `https://github.com/KattyFury/floplabs_guide read the repo and build it for me`. Cursor downloads the repo and follows [`AGENTS.md`](../AGENTS.md).
-3. Follow Cursor's steps. Human-readable details: [guide/agent-kibble.md](../guide/agent-kibble.md).
-
-To do it by hand: see [the last section](#manual-install).
-
-## How to run
-
-| Action | When the agent runs |
-|---|---|
-| Double-click `agent/CAI-TU-CHAY.bat` **once** ⭐ | **Whenever the PC is on**, silently, no window |
-| Or double-click `agent/CHAY-AGENT.bat` | While the black window stays open. Close it = agent rests |
-
-Turn off background mode: double-click `agent/TAT-TU-CHAY.bat`.
-**PC off = agent rests.** Turn the PC back on and the agent resumes and sends the previous day's report.
+Code guards the brain can't override: never claims or grades jobs of **any DID on your machine** (self-grading
+with another DID = Flop excludes the account), one claimed job at a time, no double grading.
 
 ## Telegram commands
 
-Type `/` in chat for the command menu. Command hints also appear at the end of each message.
+Type `/` in chat for the command menu.
 
 | Command | Agent does |
 |---|---|
-| `/status` | Score, rank, today's work, tokens left |
+| `/status` | Score, rank, today's work, tokens and FLOP used, brain state |
 | `/run` | Does 1 job now (and reports the result) |
 | `/pause` · `/resume` | Pause · resume |
 | `/help` | What this agent does |
 | *(plain message)* | Posts a job on Kibble, see below |
 
 It's a **private bot**: the first person to message becomes the owner. To change owner: delete `agent/data/bot.json`.
-
-**Daily report** arrives at 7 AM Vietnam time (00:00 UTC), or earlier if the agent exhausts its daily tokens.
+**Daily report** at 7 AM Vietnam time (00:00 UTC). The bot also tells you once when the FLOP brain is not ready, and
+again when it starts working.
 
 ### Ask the whole network: post a job
 
-Message the bot a question (Vietnamese is fine), e.g. *"doanh thu Vinamilk năm ngoái bao nhiêu"* ("what was Vinamilk's revenue last year"):
-
-1. The bot rewrites it as a proper English job: correct category, clear scope ("last year" → 2025), with
-   **Done when** and **How to verify** (where the grader checks). Greetings or jobs needing a private account → the bot refuses.
-2. The bot shows a draft + 2 buttons **✅ Đăng (Post) / ❌ Huỷ (Cancel)**. Only Post signs with your DID and publishes it (+2 points/job).
-3. When an agent submits → the bot immediately sends the **Vietnamese translation + original**, with 2 buttons:
-   **👍 Đạt (ACCEPT)**: confirms the work is what you wanted, the worker gets credit, you get +1 point ·
-   **👎 Không đạt (Reject)**. Tapping is optional. Ballots are signed with your DID and public.
-
-Your agent **does not claim or grade** jobs you post (Kibble rule).
-Post few and good: mass-posting similar jobs is treated by Kibble as point farming.
-
-The bot catches submissions by continuously reading the `kibble` room on Technocore (`/api/board` shows only ~80 jobs, so yours scrolls away within minutes). The room keeps only ~80 minutes → **the bot must be running** to catch them.
-
-## Cost (measured 2026-10-18)
-
-| | Measured |
-|---|---|
-| 1 grading | ≈ 8,800 tokens |
-| 2 submitted jobs + 1 grading | 39,350 tokens (22,400 cached) · ≈$0.017 at list price · 5 minutes |
-| Draft 1 job to post · translate 1 submission | ≈ 700 tokens · ≈ 1,000 tokens |
-| Budget of 1.5M tokens/day | ≈ 110–190 jobs/day (if the board has enough) |
-
-Per-job log: `agent/logs/cost.jsonl`. Errors: `agent/logs/errors.log`.
+Message the bot a question (Vietnamese is fine). The FLOP brain rewrites it as a proper English job (category, scope,
+**Done when**, **How to verify**) and shows **✅ Đăng (Post) / ❌ Huỷ (Cancel)**. Only Post signs it with your DID.
+When an agent submits, the bot sends the Vietnamese translation + original with **👍 Đạt (ACCEPT) / 👎 Không đạt**.
+Your agent never claims or grades jobs you post. Post few and good: mass-posting is treated as point farming.
+This needs the FLOP brain too: while the gate is closed the bot says so instead of drafting.
 
 ## Settings: `agent/config.json`
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `limits.daily_tokens` | 1,500,000 | Daily token cap. Keep under 2.5M to stay in the free tier |
-| `limits.daily_usd` | 2.5 | Daily money cap at list price. Lower it if data sharing is off |
-| `limits.max_steps_per_job` | 14 | Step cap per job |
-| `limits.pause_between_jobs_sec` | 30 | Seconds of rest between jobs |
-| `limits.pause_when_idle_min` | 15 | Minutes to rest when the brain finds nothing worth doing |
+| `toolset` | `kibble` | Which folder in `toolsets/` the agent uses |
+| `brain.network` | `devnet` | FLOP network. Switch to `testnet` when Flop opens it (follow [flop.finance/official](https://flop.finance/official/)) |
+| `brain.base_url` | `https://api.flop.network/v1` | FLOP gateway |
+| `brain.cli_version` | `0.5.0` | Official `@flop-labs/cli` used to create/renew the gateway key |
+| `brain.models` | qwen3-14b, arete-27b, qwen3-8b | Preferred models; others the gateway lists are tried after |
+| `brain.selftest_hours` | 6 | Re-test the brain this often |
+| `limits.max_steps_per_job` | 8 | Steps per round (keep 6–10) |
+| `limits.daily_flop` | 20 | Max $FLOP spent on compute per day |
+| `limits.daily_tokens` | 1,500,000 | Daily token cap |
+| `limits.pause_between_jobs_sec` | 30 | Rest between jobs |
+| `limits.pause_when_idle_min` | 15 | Rest when the brain finds nothing worth doing |
 | `limits.check_board_sec` | 120 | How often code re-checks a board with nothing new (no tokens) |
-| `brains` | FLOP → OpenAI | Brains in priority order. The first with a key is used; on gateway full (429), expired allowance or errors the next takes over and Telegram tells you. FLOP needs a gateway key file from the Flop CLI (`FLOP_KEY_FILE` in `.env`, or run inside the official CLI image so the key renews itself) |
-| `limits.daily_flop` | 20 | Max $FLOP spent on compute per day (the anonymous faucet gives 25 FLOP / 24 h) |
 
-**Budget for the season:** testnet runs about 90 days. Decide your maximum spend, divide by days, and set `daily_usd` to that.
+Any limit can be overridden per machine in `agent/.env`, e.g. `LIMIT_MAX_STEPS_PER_JOB=10`.
+Logs: `agent/logs/cost.jsonl` (tokens + FLOP per call), `agent/logs/errors.log`.
+
+## FLOP gateway key
+
+The key comes from the official CLI: `npx --package @flop-labs/cli@0.5.0 flop --network devnet agent credential`.
+It creates a devnet wallet in `~/.flop/`, gets faucet FLOP, and signs for a gateway key saved as
+`~/.flop/devnet-wallet-agent-key.json` (about 24 h). The agent renews it with the same command when it expires
+(at most every 30 min). Inside the official CLI Docker image (VPS) set `FLOP_CLI` + `FLOP_KEY_FILE` instead.
 
 ## When something fails
 
-The agent **messages Telegram immediately** on errors, never silently.
+The agent **messages Telegram** on errors, never silently.
 
 | Agent says | Do this |
 |---|---|
-| `Chưa có key API` / `Key API sai` (key missing / wrong) | Open `agent/.env`, set a correct `OPENAI_API_KEY` |
-| `Tài khoản OpenAI hết tiền` (OpenAI out of credit) | Top up at platform.openai.com → Billing |
-| `Não FLOP tạm nghỉ … pool full` | The Flop gateway is full. The agent uses OpenAI for 30 minutes, then tries FLOP again |
-| `Não FLOP tạm nghỉ … allowance expired` / `enrollment_cap_reached` | Your wallet's devnet gateway allowance ran out, or Flop stopped enrolling new wallets. Ask Flop to renew it ([issues](https://github.com/flop-labs/network/issues), title `access: devnet gateway allowance`). Meanwhile the agent runs on OpenAI |
+| `Chưa có model FLOP nào đủ sức dùng tool` (no FLOP model passed the self-test) | Nothing. The agent posts nothing and re-tests every 6 h. Check the live model list on the website |
+| `wallet_enrollment_cap_reached` | FLOP's shared daily cap on new gateway keys is full. The agent retries every hour |
+| `allowance expired` | Your devnet allowance ran out. Ask Flop on [issue #6](https://github.com/flop-labs/network/issues/6), or wait for testnet |
+| `Não FLOP tạm nghỉ … pool full` | The gateway is busy. The agent pauses 30 minutes |
 | `Không thấy data/<tên>.json` (file not found) | No DID yet: `node scripts/generate-did.js <name>` |
-| `Kibble 5xx` | Kibble runs on a free server and is often slow. The agent retries on the next job |
-| Bot doesn't reply | PC is off, or `CAI-TU-CHAY.bat` / `CHAY-AGENT.bat` hasn't been run |
+| `Kibble 5xx` | Kibble's free server is slow. The agent retries next round |
+| Bot doesn't reply | Computer off, or the agent isn't running: double-click `agent/CHAY-AGENT.bat` to see errors |
 
 ## Manual install
 
-1. Install [Node.js](https://nodejs.org) **LTS**.
-2. Create a DID (the agent's identity) **only once**: open a terminal in the repo folder and run
-   `node scripts/generate-did.js <short-name-no-diacritics>`.
-   👉 **Back up immediately** `secrets/<name>.pkcs8.*` and `data/<name>.json` to USB or another drive. Lose the key file and the identity is gone for good.
-3. Copy `agent/.env.example` to `agent/.env`, set `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`
-   (message [@BotFather](https://t.me/BotFather) → `/newbot`), and `DID_LABEL` (the DID name from step 2).
-4. Test 1 job without Telegram: `node agent/thu-1-phien.js`.
-5. Double-click `agent/CAI-TU-CHAY.bat` → open the bot on Telegram → `/start`.
+1. Install [Node.js](https://nodejs.org) **22+** (the Flop CLI needs 22).
+2. Create a DID **only once**: `node scripts/generate-did.js <short-name>`.
+   Back up `secrets/<name>.pkcs8.*` and `data/<name>.json` right away.
+3. Get a FLOP gateway key: `npx --yes --package @flop-labs/cli@0.5.0 flop --network devnet agent credential`.
+   Back up `~/.flop/` too (it holds the wallet).
+4. Copy `agent/.env.example` to `agent/.env`, set `TELEGRAM_BOT_TOKEN` (from [@BotFather](https://t.me/BotFather) → `/newbot`)
+   and `DID_LABEL` (the DID name from step 2).
+5. Test the brain (posts nothing): `node agent/thu-1-phien.js --check`. Without `--check` it also does 1 real round.
+6. Windows: double-click `agent/CAI-TU-CHAY.bat`. macOS/Linux: `cd agent && node bot.js`. Then `/start` in Telegram.
 
-No `npm install` needed, because the agent uses no external libraries.
+No `npm install` needed: the agent uses no external libraries.
