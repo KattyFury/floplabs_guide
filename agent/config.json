@@ -1,11 +1,11 @@
 {
-  "_ghi_chu": "NÚM VẶN của agent. Não CHỈ dùng compute FLOP (không có OpenAI/Claude/dự phòng nào khác). Testnet mở (dự kiến 2026-11-24): đổi brain.network sang \"testnet\" theo hướng dẫn chính thức.",
+  "_ghi_chu": "NÚM VẶN của agent. Não CHỈ dùng compute FLOP (không có OpenAI/Claude/dự phòng nào khác). Testnet chạy từ 2026-11-24 nhưng agent chưa vào được (Flop chưa mở faucet/gateway testnet, CLI chỉ cấp key devnet). Khi Flop mở: đổi brain.network sang \"testnet\".",
   "toolset": "kibble",
   "brain": {
-    "_ghi_chu": "Gateway FLOP (kiểu OpenAI). Key do CLI chính thức tạo (`flop agent credential`), hết hạn ~24h, agent tự gia hạn bằng CLI. models = model ưu tiên; gateway có model nào khác thì thử sau. Mỗi model phải qua bài thử dùng tool (selftest) mới được làm việc; thử lại mỗi selftest_hours giờ.",
+    "_ghi_chu": "Gateway FLOP (kiểu OpenAI). Key do CLI chính thức tạo (`flop agent credential`), hết hạn ~24h, agent tự gia hạn bằng CLI. models = model ưu tiên; gateway có model nào khác thì thử sau. Mỗi model phải qua bài thử dùng tool (selftest) mới được làm việc; thử lại mỗi selftest_hours giờ. base_url để trống = gateway chính thức của network (devnet: api.flop.network, testnet: gateway.testnet.flop.network).",
     "network": "devnet",
-    "base_url": "https://api.flop.network/v1",
-    "cli_version": "0.5.0",
+    "base_url": "",
+    "cli_version": "0.8.1",
     "key_file": "",
     "models": [
       "qwen/qwen3-14b",

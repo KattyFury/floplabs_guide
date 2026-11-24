@@ -97,8 +97,8 @@ This needs the FLOP brain too: while the gate is closed the bot says so instead 
 |---|---|---|
 | `toolset` | `kibble` | Which folder in `toolsets/` the agent uses |
 | `brain.network` | `devnet` | FLOP network. Switch to `testnet` when Flop opens it (follow [flop.finance/official](https://flop.finance/official/)) |
-| `brain.base_url` | `https://api.flop.network/v1` | FLOP gateway |
-| `brain.cli_version` | `0.5.0` | Official `@flop-labs/cli` used to create/renew the gateway key |
+| `brain.base_url` | empty | FLOP gateway; empty = official one for `brain.network` (devnet `api.flop.network/v1`, testnet `gateway.testnet.flop.network/v1`) |
+| `brain.cli_version` | `0.8.1` | Official `@flop-labs/cli` used to create/renew the gateway key |
 | `brain.models` | qwen3-14b, arete-27b, qwen3-8b | Preferred models; others the gateway lists are tried after |
 | `brain.selftest_hours` | 6 | Re-test the brain this often |
 | `limits.max_steps_per_job` | 8 | Steps per round (keep 6–10) |
@@ -113,7 +113,7 @@ Logs: `agent/logs/cost.jsonl` (tokens + FLOP per call), `agent/logs/errors.log`.
 
 ## FLOP gateway key
 
-The key comes from the official CLI: `npx --package @flop-labs/cli@0.5.0 flop --network devnet agent credential`.
+The key comes from the official CLI: `npx --package @flop-labs/cli@0.8.1 flop --network devnet agent credential`.
 It creates a devnet wallet in `~/.flop/`, gets faucet FLOP, and signs for a gateway key saved as
 `~/.flop/devnet-wallet-agent-key.json` (about 24 h). The agent renews it with the same command when it expires
 (at most every 30 min). Inside the official CLI Docker image (VPS) set `FLOP_CLI` + `FLOP_KEY_FILE` instead.
@@ -137,7 +137,7 @@ The agent **messages Telegram** on errors, never silently.
 1. Install [Node.js](https://nodejs.org) **22+** (the Flop CLI needs 22).
 2. Create a DID **only once**: `node scripts/generate-did.js <short-name>`.
    Back up `secrets/<name>.pkcs8.*` and `data/<name>.json` right away.
-3. Get a FLOP gateway key: `npx --yes --package @flop-labs/cli@0.5.0 flop --network devnet agent credential`.
+3. Get a FLOP gateway key: `npx --yes --package @flop-labs/cli@0.8.1 flop --network devnet agent credential`.
    Back up `~/.flop/` too (it holds the wallet).
 4. Copy `agent/.env.example` to `agent/.env`, set `TELEGRAM_BOT_TOKEN` (from [@BotFather](https://t.me/BotFather) → `/newbot`)
    and `DID_LABEL` (the DID name from step 2).

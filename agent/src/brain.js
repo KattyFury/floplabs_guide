@@ -1,4 +1,4 @@
-// The agent's brain: FLOP compute only (api.flop.network, OpenAI-style chat completions, paid in $FLOP).
+// The agent's brain: FLOP compute only (official FLOP gateway of brain.network, OpenAI-style chat completions, paid in $FLOP).
 // No other provider. If FLOP is not usable, the agent waits and says why. It never falls back to another AI.
 //
 // Tool calling, two modes, same conversation format inside the agent (OpenAI style):
@@ -39,7 +39,9 @@ export function onBrainNotice(fn) {
 }
 const tell = (text) => notify && Promise.resolve(notify(text)).catch(() => {});
 
-const conf = (cfg) => cfg.brain;
+// Official gateway per network (from @flop-labs/sdk network profiles). brain.base_url overrides it.
+const GATEWAYS = { devnet: "https://api.flop.network/v1", testnet: "https://gateway.testnet.flop.network/v1" };
+const conf = (cfg) => ({ ...cfg.brain, base_url: cfg.brain.base_url || GATEWAYS[cfg.brain.network] });
 
 // ---------- FLOP gateway key (from the official Flop CLI) ----------
 
@@ -68,6 +70,8 @@ function readFlopKey(b) {
 function renewFlopKey(b) {
   if (Date.now() - flopState.lastRenew < 30 * 60_000) return Promise.resolve({ ok: false, message: "renew skipped" });
   flopState.lastRenew = Date.now();
+  // CLI 0.8.1: `agent credential` refuses any network but devnet. Testnet keys: wait for Flop's official way.
+  if (b.network !== "devnet") return Promise.resolve({ ok: false, message: `Flop CLI chưa cấp key gateway cho ${b.network} (agent credential chỉ chạy devnet). Agent chờ tới khi Flop mở.` });
   const done = (resolve) => (err, stdout, stderr) => {
     const out = String(stdout || "");
     let j = null;

@@ -30,7 +30,7 @@ Public community guide for Flop Labs ($FLOP) + the Agent Kibble framework + its 
 
 - Gateway `https://api.flop.network/v1`, `/models` is public with CORS. Devnet lists only `qwen/qwen2.5-0.5b-instruct`,
   `supported_parameters: ["max_tokens"]` (no native tools).
-- `@flop-labs/cli` 0.5.0 (Node 22+): `flop --network devnet agent credential [--json]` provisions/reuses a wallet-signed
+- `@flop-labs/cli` 0.8.1 pinned (Node 22+; was 0.5.0 until 2026-11-24, 0.8.0 needed for devnet runtime 1014034): `flop --network devnet agent credential [--json]` provisions/reuses a wallet-signed
   devnet gateway key (~24 h). Known failures: `wallet_enrollment_cap_reached`, `allowance expired` (flop-labs/network#6).
 - Testnet (checked 2026-11-24): live, unscored opening. RPC `wss://testnet.flop.network` (genesis `0x918a…d800`,
   spec 1014035), explorer https://testnet.flopscan.io/. Faucet `faucet.testnet.flop.network` and gateway
