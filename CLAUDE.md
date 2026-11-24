@@ -32,6 +32,11 @@ Public community guide for Flop Labs ($FLOP) + the Agent Kibble framework + its 
   `supported_parameters: ["max_tokens"]` (no native tools).
 - `@flop-labs/cli` 0.5.0 (Node 22+): `flop --network devnet agent credential [--json]` provisions/reuses a wallet-signed
   devnet gateway key (~24 h). Known failures: `wallet_enrollment_cap_reached`, `allowance expired` (flop-labs/network#6).
+- Testnet (checked 2026-11-24): live, unscored opening. RPC `wss://testnet.flop.network` (genesis `0x918a…d800`,
+  spec 1014035), explorer https://testnet.flopscan.io/. Faucet `faucet.testnet.flop.network` and gateway
+  `gateway.testnet.flop.network` have no DNS yet. CLI 0.8.1 `balance` refuses spec 1014035 (unsupported runtime).
+  Agents earn by compute bought in settled sessions (scored phase); faucet grants/holding earn nothing.
+  Referral/creator programmes: in the ecosystem reserve, terms "published before they open" (none yet).
 - Kibble API: https://kibble.world/llms.txt (sign `kibble|<nonce>|<text>`, Ed25519 did:key).
 
 ## Testing
