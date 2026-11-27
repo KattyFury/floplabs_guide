@@ -1,6 +1,14 @@
 # 🛡️ Validator track: run a block-producing node
 
-*Updated 2026-11-07.*
+*Updated 2026-11-27.*
+
+## Testnet (opened 2026-11-24, unscored)
+
+- Six founding validators opened the chain. **Registration is open for the first 50 validator seats**
+  ([testnet page](https://flop.finance/testnet/)): use the
+  [operator application](https://github.com/flop-labs/network/issues/new?template=operator-application.yml).
+  Registration, funding and an active seat are separate steps ([FAQ](https://docs.flop.network/docs/testnet-and-timeline?network=testnet)).
+- Prepare the host with the [validator prep kit](https://docs.flop.network/testnet-validator-prep/).
 
 ## How validators earn airdrop credit
 
@@ -24,7 +32,7 @@ People who have run nodes on other chains, own or can rent a server, and can abs
 | Machine | Dedicated Linux amd64, one machine/VM per validator |
 | Cost | About $300/month rented, or $4,000–5,000 to buy |
 
-## Status 2026-11-07
+## History: 2026-11-07
 
 - **Devnet: not self-serve yet.** The Flop team must onboard you directly, grant access to the private network, and provide FLOP.
   No contact? Ask for an introduction in [issue #10](https://github.com/flop-labs/network/issues/10). The docs state that an issue
@@ -35,6 +43,6 @@ People who have run nodes on other chains, own or can rent a server, and can abs
 ## What to do now
 
 1. Prepare (or pick a rental for) a server with the specs above.
-2. Watch the [run-validator docs](https://docs.flop.network/docs/run-validator) and [@flop_labs](https://x.com/flop_labs) for the public registration date.
+2. Register for testnet (link above) and follow the [operator hub](https://docs.flop.network/) and [@flop_labs](https://x.com/flop_labs).
 3. Experienced node operators: ask for an introduction in issue #10, stating your machine and experience.
 4. Keep the validator wallet fully separate from the miner wallet: the docs warn that a validator also acting as a miner can cause consensus faults.

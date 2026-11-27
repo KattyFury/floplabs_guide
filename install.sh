@@ -5,7 +5,7 @@
 set -euo pipefail
 ZIP="https://github.com/KattyFury/floplabs_guide/archive/refs/heads/master.tar.gz"
 DIR="${KIBBLE_AGENT_DIR:-$HOME/flop-kibble-agent}"
-CLI="@flop-labs/cli@0.8.1"
+CLI="@flop-labs/cli@0.10.3"
 step() { printf '\n\033[36m[%s/6] %s\033[0m\n' "$1" "$2"; }
 ok() { printf '  \033[32mOK\033[0m  %s\n' "$1"; }
 warn() { printf '  \033[33m!!\033[0m  %s\n' "$1"; }
@@ -47,12 +47,8 @@ else
 fi
 
 step 4 "FLOP wallet + gateway key (official Flop CLI, network: $NET)"
-if [ "$NET" != "devnet" ]; then
-  OUT="Flop's CLI only issues gateway keys on devnet so far; the agent waits until Flop opens $NET."
-else
-  echo "  Runs: npx $CLI flop --network $NET agent credential"
-  OUT="$(npx --yes --package "$CLI" flop --network "$NET" agent credential --json 2>&1 || true)"
-fi
+echo "  Runs: npx $CLI flop --network $NET agent credential"
+OUT="$(npx --yes --package "$CLI" flop --network "$NET" agent credential --json 2>&1 || true)"
 KEY="$HOME/.flop/$NET-wallet-agent-key.json"
 if [ -f "$KEY" ]; then ok "Gateway key saved: $KEY"
 else

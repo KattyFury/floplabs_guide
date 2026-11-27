@@ -78,8 +78,8 @@
   <p class="lead">It does small research jobs on <a href="https://kibble.world">Kibble</a> while your computer is on. Its brain runs on the FLOP network, so you don't need ChatGPT Plus, Claude Pro or a credit card. You control it from Telegram.</p>
   <div class="card status" id="status">
     <span><span class="dot ok"></span>Devnet: live (practice, no rewards)</span>
-    <span><span class="dot warn"></span>Testnet: live 24 Nov 2026 (unscored)</span>
-    <span><span class="dot" id="mdot"></span>Models: <span id="models">checking…</span></span>
+    <span><span class="dot warn"></span>Testnet: live, unscored, no agent keys yet (27 Nov)</span>
+    <span><span class="dot" id="mdot"></span>Devnet models: <span id="models">checking…</span></span>
   </div>
 </header>
 
@@ -140,8 +140,14 @@
 </ol>
 
 <div class="card">
-  <h3>Testnet is live (24 Nov), but not open to agents yet</h3>
-  <p style="margin:0">The chain is running (<a href="https://testnet.flopscan.io/">testnet.flopscan.io</a>), but this first phase is <b>unscored</b>: nothing counts toward the airdrop yet. The testnet faucet and gateway are not online yet (checked 24 Nov), so an agent can't buy compute there today. Devnet wallets don't carry over. <b>Don't change anything for now.</b> This page will give the exact steps once Flop turns agent access on.</p>
+  <h3>Testnet: where it stands (checked 27 Nov 2026)</h3>
+  <ul class="clean">
+    <li>The chain is running (<a href="https://testnet.flopscan.io/">testnet.flopscan.io</a>), but this phase is <b>unscored</b>: nothing counts toward the airdrop, nothing is backfilled, and we saw no announced start date for scoring.</li>
+    <li>The <a href="https://faucet.flop.network">testnet faucet</a> offers agents 10 test FLOP per wallet per 24 hours, and the testnet gateway lists models.</li>
+    <li><b>This agent can't run on testnet yet:</b> the gateway answered 404 when we asked for the first step of getting a key. The Flop CLI treats that as wallet sign-up being switched off.</li>
+    <li>Another route is paying a miner directly (<code>flop session run</code>). It needs the miner's web address, and Flop's miner guide says there is no public miner list yet. We haven't tried it, and this agent doesn't support it.</li>
+  </ul>
+  <p style="margin:10px 0 0"><b>Keep the default (devnet).</b> Switching now creates a testnet wallet and asks the faucet, then still gets no key.</p>
 </div>
 
 <h2>Something wrong?</h2>
@@ -156,7 +162,9 @@
       <dt><code>wallet_enrollment_cap_reached</code></dt>
       <dd>FLOP's daily limit for new users is full. Do nothing: the agent retries every hour.</dd>
       <dt><code>allowance expired</code></dt>
-      <dd>Your devnet access ran out. Ask on <a href="https://github.com/flop-labs/network/issues/6">Flop's GitHub</a>, or just wait for testnet.</dd>
+      <dd>Your devnet access ran out. Ask on <a href="https://github.com/flop-labs/network/issues/6">Flop's GitHub</a>, or wait for testnet keys to open.</dd>
+      <dt><code>wallet enrollment is not enabled on the testnet gateway</code></dt>
+      <dd>Testnet keys aren't open yet. Set <code>"network": "devnet"</code> in <code>agent/config.json</code>.</dd>
       <dt>"No FLOP model can use tools yet"</dt>
       <dd>Normal today. The agent checks again every 6 hours and messages you when it starts working.</dd>
       <dt><code>pool full (429)</code></dt>

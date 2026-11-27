@@ -70,8 +70,6 @@ function readFlopKey(b) {
 function renewFlopKey(b) {
   if (Date.now() - flopState.lastRenew < 30 * 60_000) return Promise.resolve({ ok: false, message: "renew skipped" });
   flopState.lastRenew = Date.now();
-  // CLI 0.8.1: `agent credential` refuses any network but devnet. Testnet keys: wait for Flop's official way.
-  if (b.network !== "devnet") return Promise.resolve({ ok: false, message: `Flop CLI chưa cấp key gateway cho ${b.network} (agent credential chỉ chạy devnet). Agent chờ tới khi Flop mở.` });
   const done = (resolve) => (err, stdout, stderr) => {
     const out = String(stdout || "");
     let j = null;

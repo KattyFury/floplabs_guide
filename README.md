@@ -9,7 +9,7 @@
 `$FLOP` is the token of **Flop Network** (Flop Labs / Arthur Hayes), a network where **AI agents pay GPU machines** to run AI.
 There is no token sale. All 4.4 billion $FLOP at launch goes to people who **do real work on testnet**.
 
-*Updated 2026-11-07. Community guide, not from Flop Labs. Always prefer [flop.finance](https://flop.finance/official/) and [@flop_labs](https://x.com/flop_labs).*
+*Updated 2026-11-27. Community guide, not from Flop Labs. Always prefer [flop.finance](https://flop.finance/official/) and [@flop_labs](https://x.com/flop_labs).*
 
 ---
 
@@ -35,11 +35,16 @@ The guide is written from this part.
 
 ---
 
-## Status today (2026-11-13)
+## Status today (2026-11-27)
 
-- **Testnet live since 2026-11-24** ([flop.finance/testnet](https://flop.finance/testnet/), [explorer](https://testnet.flopscan.io/)); the opening phase is unscored, the scored phase is planned. First announced ([Arthur Hayes](https://x.com/CryptoHayes/status/2121144411484827836), [@flop_labs](https://x.com/flop_labs/status/2121146318135644275)). Devnet wallets and state are not carried over (runs ~90 days → snapshot). Mainnet expected Q1 2027. Agent access on testnet (faucet, gateway) is not online yet as of 2026-11-24.
-- **Devnet is open to everyone** for practice. **No rewards**, and the chain may be reset.
-- The faucet works. Buying compute (calling AI) does not yet: the npm CLI is on a mismatched version and the gateway has no model.
+- **Testnet live since 2026-11-24** ([flop.finance/testnet](https://flop.finance/testnet/), [explorer](https://testnet.flopscan.io/)).
+  This opening is **unscored**: activity earns nothing and is not backfilled. We saw no announced start date for scoring.
+  Devnet wallets and state are not carried over. Mainnet is planned for Q1 2027.
+- **Agents on testnet:** the faucet takes signed claims (10 test FLOP per wallet per 24 h) and the gateway lists models,
+  but its wallet sign-up for gateway keys answered 404. Paying a miner directly is the other route
+  ([agent guide](guide/agent.md)); we have not tried it.
+- **Miners and validators** have separate testnet onboarding ([miner](guide/miner.md), [validator](guide/validator.md)).
+- **Devnet** is for practice. **No rewards**, and nothing carries over.
 - Each guide page starts with its track's details.
 
 ## Avoid scams (10 seconds)
@@ -64,7 +69,7 @@ The guide is written from this part.
 
 **Official sources:**
 [Official links](https://flop.finance/official/) · [Docs](https://docs.flop.network) · [Q&A](https://ask.flop.finance) ·
-[Airdrop](https://flop.finance/airdrop/) · [Testnet](https://flop.finance/testnet/) · [Faucet](https://faucet.flop.network) ·
-[Explorer](https://explorer.devnet.flop.network) · [Kibble llms.txt](https://kibble.world/llms.txt)
+[Airdrop](https://flop.finance/airdrop/) · [Testnet](https://flop.finance/testnet/) · [Testnet faucet](https://faucet.flop.network) ·
+[Testnet explorer](https://testnet.flopscan.io/) · [Kibble llms.txt](https://kibble.world/llms.txt)
 
 [MIT](LICENSE)

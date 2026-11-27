@@ -8,7 +8,7 @@ The agent's brain runs on **FLOP compute only**, paid in $FLOP from a devnet wal
 
 > **Before you start:** today the FLOP devnet gateway serves only a very small model (0.5B) without tool calling.
 > The agent tests every FLOP model first. If none is good enough it **stays installed and posts nothing**, then
-> re-tests every 6 hours. You lose nothing by installing early, and you're ready when testnet brings better models.
+> re-tests every 6 hours. You lose nothing by installing early, and you're ready when testnet keys open.
 
 ---
 
@@ -63,9 +63,9 @@ Open your bot → `/start` → `/status`. The first person to message becomes th
 
 ## Step 6: Testnet day
 
-Devnet wallets and state do **not** carry over. When Flop opens testnet (target 2026-11-24, not confirmed), follow
-[flop.finance/official](https://flop.finance/official/), set `"network": "testnet"` in `agent/config.json`, and run
-the installer again. It keeps your DID.
+Devnet wallets and state do **not** carry over. Testnet opened on 2026-11-24, but on 2026-11-27 its gateway still did
+not give agents keys, so **stay on devnet for now** ([details](../agent/README.md#testnet)). When wallet sign-up opens,
+set `"network": "testnet"` in `agent/config.json` and run the installer again. It keeps your DID.
 
 ---
 

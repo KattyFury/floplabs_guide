@@ -1,6 +1,6 @@
 # 📣 Creator track: bring in real users (ref to earn)
 
-*Updated 2026-11-13. Rules from the "referral programme" FAQ on [docs.flop.network](https://docs.flop.network).*
+*Updated 2026-11-27 (dates only; the programme rules were last checked 2026-11-13). Rules from the "referral programme" FAQ on [docs.flop.network](https://docs.flop.network).*
 
 ## How creators are paid
 
@@ -29,12 +29,13 @@ A community that only farms the faucet and leaves will not rank.
   > "There's no need to register or apply, since the KOL partnership program will be open to everyone. We'll share how to get your unique referral link and the details of the weekly KOL leaderboard soon."
 - So: the **referral link and the weekly KOL leaderboard are not live yet**; they are open to everyone when they launch. The optional interest form at `flop.finance/apply/kol` (a Google Form) is a contact list, not a gate.
 - Preview of the leaderboard and onboarding (email, wallet, socials, unique ref link, weekly lottery): [@CryptoHayes, 2026-10-15](https://x.com/CryptoHayes/status/2110624607023817069).
-- Testnet / airdrop begins **2026-11-24 (tentative)**: [@CryptoHayes](https://x.com/CryptoHayes/status/2121144411484827836), [@flop_labs](https://x.com/flop_labs/status/2121146318135644275). Devnet state is **not** migrated to testnet ([@flop_labs](https://x.com/flop_labs/status/2117971590122229936)).
+- Testnet opened **2026-11-24**, unscored. The [airdrop page](https://flop.finance/airdrop/) says creator and referral
+  programme terms are published before the programmes open. Devnet state is **not** migrated to testnet.
 
 ## What to do now
 
 1. **Gather your community first** (Telegram group / X): when ref links open, send one to everyone at once.
 2. **Teach them the Agent track**: cheapest, and exactly what the leaderboard counts (wallets spending FLOP on inference). Use [agent.md](agent.md) as the tutorial.
 3. Anyone in the group with a GPU → point them to the [miner](miner.md) track: inference they receive counts for you too.
-4. Write **truthful** content: devnet has no rewards, testnet opens 2026-11-24 (not before), nobody sells early spots. Do not promise amounts.
+4. Write **truthful** content: devnet has no rewards, testnet is live but unscored, nobody sells early spots. Do not promise amounts.
 5. Watch [flop.finance](https://flop.finance) and [@flop_labs](https://x.com/flop_labs) for the ref-link announcement, then share it the same day.

@@ -4,7 +4,7 @@
 # (mounted at /root/.flop, mode 700, never in git). Deploy: node deploy/deploy.mjs
 services:
   flop-agent:
-    image: ghcr.io/flop-labs/flop-core/cli:v0.1.321@sha256:3a473509dc0d5f9b5dfb5283a78886e285f4275274741b96a5e5575334b664e8
+    image: ghcr.io/flop-labs/flop-core/cli:v0.1.505@sha256:d06643e5f4407347da4a4fdf64e8dd3e23e2b6e96f0e2c1576d64ac5eca58546
     container_name: flop-agent
     restart: unless-stopped
     working_dir: /work/agent

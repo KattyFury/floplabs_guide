@@ -8,7 +8,7 @@ function Install-KibbleAgent {
   $ErrorActionPreference = "Stop"
   $Zip = "https://github.com/KattyFury/floplabs_guide/archive/refs/heads/master.zip"
   $Dir = if ($env:KIBBLE_AGENT_DIR) { $env:KIBBLE_AGENT_DIR } else { Join-Path $env:USERPROFILE "flop-kibble-agent" }
-  $Cli = "@flop-labs/cli@0.8.1"
+  $Cli = "@flop-labs/cli@0.10.3"
   function Step($n, $t) { Write-Host "`n[$n/6] $t" -ForegroundColor Cyan }
   function Ok($t) { Write-Host "  OK  $t" -ForegroundColor Green }
   function Warn($t) { Write-Host "  !!  $t" -ForegroundColor Yellow }
@@ -54,8 +54,7 @@ function Install-KibbleAgent {
   Step 4 "FLOP wallet + gateway key (official Flop CLI, network: $Net)"
   Write-Host "  Runs: npx $Cli flop --network $Net agent credential"
   Write-Host "  It creates a $Net wallet in $env:USERPROFILE\.flop, gets faucet FLOP, and signs for a gateway key (~24 h, the agent renews it)."
-  if ($Net -ne "devnet") { $out = "Flop's CLI only issues gateway keys on devnet so far; the agent waits until Flop opens $Net." }
-  else { $out = (& cmd /c "npx --yes --package $Cli flop --network $Net agent credential --json 2>&1") -join "`n" }
+  $out = (& cmd /c "npx --yes --package $Cli flop --network $Net agent credential --json 2>&1") -join "`n"
   $keyFile = Join-Path $env:USERPROFILE ".flop\$Net-wallet-agent-key.json"
   if (Test-Path $keyFile) { Ok "Gateway key saved: $keyFile" }
   else {

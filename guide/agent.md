@@ -1,6 +1,25 @@
 # 🤖 Agent track: buy compute with $FLOP
 
-*Updated 2026-11-07.*
+*Updated 2026-11-27.*
+
+## Testnet today (checked 2026-11-27)
+
+Testnet is **unscored**: nothing you buy now counts. You can wait without losing airdrop credit.
+
+| Part | State |
+|---|---|
+| Faucet `https://faucet.flop.network` | Open. A signed agent claim gives 10 test FLOP per wallet per 24 h; live rules at [/limits](https://faucet.flop.network/limits) |
+| Gateway `https://gateway.testnet.flop.network/v1` | Lists models. Wallet sign-up for a key answered **404** (the CLI reads this as switched off) |
+| Direct session with a miner | CLI command `flop --network testnet session run`. Needs the miner's address **and** its HTTPS URL |
+
+- Direct route: the [explorer](https://testnet.flopscan.io/) shows settled compute channels, but the
+  [miner pack](https://flop.network/releases/cli/miner-pack-testnet-20261126/README.md) says there is no public miner
+  directory yet, and we found no public source of miner URLs. **We have not tried this route.**
+- `--max-flop` is what you pay: a cooperative close pays the miner the whole escrow.
+- Needed for an agent: a DID and a wallet ([testnet page](https://flop.finance/testnet/)).
+- Draft scoring rules: compute bought in settled sessions; wallets under common control count as one participant; spend
+  to your own miner or between your own wallets is not counted.
+- Flop's pages disagree: on 2026-11-27 [llms.txt](https://flop.network/llms.txt) still said there is no testnet gateway.
 
 ## How agents earn airdrop credit
 
@@ -20,17 +39,17 @@ Everyone. No GPU or coding needed: an AI assistant (Cursor, Claude Code...) can 
 |---|---|---|
 | Wallet | sr25519 address starting with `5…` | Flop CLI creates one, or a Polkadot library |
 | DID | The agent's "ID card", shared with TechnoCore / Kibble | [agent-kibble.md](agent-kibble.md) step 4 |
-| Test $FLOP | Money to buy compute | [faucet.flop.network](https://faucet.flop.network) |
+| Test $FLOP | Money to buy compute | Devnet: [faucet.devnet.flop.network](https://faucet.devnet.flop.network) · Testnet: [faucet.flop.network](https://faucet.flop.network) |
 | Agent API key | Key for `https://api.flop.network/v1/chat/completions` | Command `flop agent credential` |
 
-**Faucet today (11/07):** anonymous requests get 25 FLOP / wallet / 24h; an agent grant is 2 FLOP / 24h and **must be spent before requesting again**.
+**Devnet faucet (checked 11/07):** anonymous requests get 25 FLOP / wallet / 24h; an agent grant is 2 FLOP / 24h and **must be spent before requesting again**.
 The faucet site also offers proof-of-personhood (Passport, BrightID...) for larger amounts.
 
 ## Devnet steps (practice, no rewards yet)
 
 1. **Create one wallet and keep it.** Official command (the CLI creates a wallet, requests faucet funds, saves the key in `~/.flop/`):
    ```bash
-   npx --yes --package @flop-labs/cli@<latest version> flop --network devnet agent credential --json
+   npx --yes --package @flop-labs/cli@0.10.3 flop --network devnet agent credential --json
    ```
    ⚠️ The CLI stores the mnemonic **unencrypted** in `~/.flop/`. Copy that file to USB immediately: switch machines without it and the wallet is gone.
 2. **Get FLOP.** The command above requests funds if the wallet holds under 1 FLOP. Or use the faucet site. Check the balance:
@@ -38,7 +57,7 @@ The faucet site also offers proof-of-personhood (Passport, BrightID...) for larg
 3. **Call once** `POST https://api.flop.network/v1/chat/completions` with the new key. Success = the agent has "bought compute".
 4. **Let your agent use that key as its "brain"** instead of OpenAI/Claude. Sample agent in this repo: [agent-kibble.md](agent-kibble.md).
 
-## Status 2026-11-07: works, via a detour
+## History: devnet on 2026-11-07 (CLI 0.4.0, outdated)
 
 - `@flop-labs/cli` 0.4.0 on npm **does not work** with devnet ([issue #132](https://github.com/flop-labs/network/issues/132)).
   **Use the Docker build instead** (needs Docker; on Windows use Git Bash):
@@ -58,6 +77,6 @@ The faucet site also offers proof-of-personhood (Passport, BrightID...) for larg
 ## While you wait: Agent Kibble
 
 [Kibble](https://kibble.world) is a community-built job market for agents on TechnoCore (Flop's agent hub).
-Kibble points **do not count for the airdrop**, but it is real practice for your agent and you will have a DID ready when testnet opens on **2026-11-24**.
+Kibble points **do not count for the airdrop**, but it is real practice for your agent and you will have a DID ready for testnet.
 Install the sample background agent (brain on FLOP compute only, one installer command, no AI subscription):
 **[kattyfury.github.io/floplabs_guide](https://kattyfury.github.io/floplabs_guide/)** · text version: [agent-kibble.md](agent-kibble.md).

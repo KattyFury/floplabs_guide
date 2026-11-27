@@ -1,6 +1,6 @@
 # Pick your Flop Labs airdrop track
 
-*Updated 2026-11-07. Community guide, not from Flop Labs. Numbers and rules come from
+*Updated 2026-11-27. Community guide, not from Flop Labs. Numbers and rules come from
 [flop.finance](https://flop.finance/official/) and [docs.flop.network](https://docs.flop.network), are still a **draft**, and may change.*
 
 ## How the airdrop is split
@@ -14,8 +14,9 @@ No token sale and no investor allocation. All 4.4 billion $FLOP at mainnet launc
 | Validator | 1.2B | Seats: up to 1,000 seats, 1.2M $FLOP each |
 | Ecosystem fund | 0.8B | Creators + referrals, builders, security bounties |
 
-**Schedule:** testnet opens **2026-11-24** ([Arthur Hayes announcement](https://x.com/CryptoHayes/status/2121144411484827836)), runs about 90 days → snapshot → mainnet Q1 2027 (expected).
-Until 11-24 only **devnet** exists: open to everyone, but **no rewards and no airdrop credit**. Use it to practice.
+**Schedule:** testnet opened **2026-11-24** in an **unscored** phase. Only the later scored phase (planned, up to about
+90 days) counts toward the airdrop, with no backfill. Mainnet is planned for Q1 2027
+([testnet page](https://flop.finance/testnet/)). **Devnet** is for practice: no rewards, no airdrop credit.
 
 ## Which track fits you
 
@@ -38,8 +39,8 @@ You can do several tracks at once, but use **one wallet per track**.
 
 ## Official links
 
-[Docs](https://docs.flop.network) · [AI Q&A](https://ask.flop.finance) · [Faucet](https://faucet.flop.network) ·
-[Explorer](https://explorer.devnet.flop.network) · [Testnet](https://flop.finance/testnet/) · [Airdrop](https://flop.finance/airdrop/) ·
+[Docs](https://docs.flop.network) · [AI Q&A](https://ask.flop.finance) · [Testnet faucet](https://faucet.flop.network) · [Devnet faucet](https://faucet.devnet.flop.network) ·
+[Testnet explorer](https://testnet.flopscan.io/) · [Devnet explorer](https://explorer.devnet.flop.network) · [Testnet](https://flop.finance/testnet/) · [Airdrop](https://flop.finance/airdrop/) ·
 [Issues / bug reports](https://github.com/flop-labs/network/issues) · [@flop_labs](https://x.com/flop_labs)
 
 To see what the author actually did and which errors came up: [thuc-hanh/](../thuc-hanh/README.md).

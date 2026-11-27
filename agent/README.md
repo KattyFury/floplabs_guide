@@ -20,7 +20,7 @@ thinks is inference bought with $FLOP.
 - Flop's draft airdrop rules count **testnet data** and exclude **"going through the motions"** accounts. So the agent
   puts quality first, and **does nothing at all** when no FLOP model is good enough (self-test gate below).
 - Today (2026-11-19) the devnet gateway serves only `qwen/qwen2.5-0.5b-instruct`, without native tool calling.
-  Expect the gate to stay closed until bigger models arrive (testnet target 2026-11-24, not confirmed).
+  Expect the gate to stay closed on devnet. The testnet gateway lists bigger models, but it does not give agents keys yet (checked 2026-11-27).
 
 ## Framework: core + toolsets
 
@@ -96,9 +96,9 @@ This needs the FLOP brain too: while the gate is closed the bot says so instead 
 | Setting | Default | Meaning |
 |---|---|---|
 | `toolset` | `kibble` | Which folder in `toolsets/` the agent uses |
-| `brain.network` | `devnet` | FLOP network. Switch to `testnet` when Flop opens it (follow [flop.finance/official](https://flop.finance/official/)) |
+| `brain.network` | `devnet` | FLOP network. Keep `devnet` until testnet wallet sign-up opens (see [Testnet](#testnet)) |
 | `brain.base_url` | empty | FLOP gateway; empty = official one for `brain.network` (devnet `api.flop.network/v1`, testnet `gateway.testnet.flop.network/v1`) |
-| `brain.cli_version` | `0.8.1` | Official `@flop-labs/cli` used to create/renew the gateway key |
+| `brain.cli_version` | `0.10.3` | Official `@flop-labs/cli` used to create/renew the gateway key |
 | `brain.models` | qwen3-14b, arete-27b, qwen3-8b | Preferred models; others the gateway lists are tried after |
 | `brain.selftest_hours` | 6 | Re-test the brain this often |
 | `limits.max_steps_per_job` | 8 | Steps per round (keep 6–10) |
@@ -113,10 +113,17 @@ Logs: `agent/logs/cost.jsonl` (tokens + FLOP per call), `agent/logs/errors.log`.
 
 ## FLOP gateway key
 
-The key comes from the official CLI: `npx --package @flop-labs/cli@0.8.1 flop --network devnet agent credential`.
+The key comes from the official CLI: `npx --package @flop-labs/cli@0.10.3 flop --network devnet agent credential`.
 It creates a devnet wallet in `~/.flop/`, gets faucet FLOP, and signs for a gateway key saved as
 `~/.flop/devnet-wallet-agent-key.json` (about 24 h). The agent renews it with the same command when it expires
 (at most every 30 min). Inside the official CLI Docker image (VPS) set `FLOP_CLI` + `FLOP_KEY_FILE` instead.
+
+## Testnet
+
+Checked 2026-11-27: the testnet faucet and gateway are online, but the gateway answers 404 to the wallet sign-up
+challenge, so we could not get a gateway key. CLI 0.10.3 creates the testnet wallet and claims from the faucet **before**
+it asks for that challenge, so switching early only leaves you with a wallet and no key. The phase is also unscored.
+When sign-up opens, set `brain.network` to `testnet`; the agent then uses `~/.flop/testnet-wallet-agent-key.json`.
 
 ## When something fails
 
@@ -126,7 +133,8 @@ The agent **messages Telegram** on errors, never silently.
 |---|---|
 | `Chưa có model FLOP nào đủ sức dùng tool` (no FLOP model passed the self-test) | Nothing. The agent posts nothing and re-tests every 6 h. Check the live model list on the website |
 | `wallet_enrollment_cap_reached` | FLOP's shared daily cap on new gateway keys is full. The agent retries every hour |
-| `allowance expired` | Your devnet allowance ran out. Ask Flop on [issue #6](https://github.com/flop-labs/network/issues/6), or wait for testnet |
+| `allowance expired` | Your devnet allowance ran out. Ask Flop on [issue #6](https://github.com/flop-labs/network/issues/6), or wait for testnet keys to open |
+| `wallet enrollment is not enabled on the testnet gateway` | Testnet keys are not open yet. Set `brain.network` back to `devnet` |
 | `Não FLOP tạm nghỉ … pool full` | The gateway is busy. The agent pauses 30 minutes |
 | `Không thấy data/<tên>.json` (file not found) | No DID yet: `node scripts/generate-did.js <name>` |
 | `Kibble 5xx` | Kibble's free server is slow. The agent retries next round |
@@ -137,7 +145,7 @@ The agent **messages Telegram** on errors, never silently.
 1. Install [Node.js](https://nodejs.org) **22+** (the Flop CLI needs 22).
 2. Create a DID **only once**: `node scripts/generate-did.js <short-name>`.
    Back up `secrets/<name>.pkcs8.*` and `data/<name>.json` right away.
-3. Get a FLOP gateway key: `npx --yes --package @flop-labs/cli@0.8.1 flop --network devnet agent credential`.
+3. Get a FLOP gateway key: `npx --yes --package @flop-labs/cli@0.10.3 flop --network devnet agent credential`.
    Back up `~/.flop/` too (it holds the wallet).
 4. Copy `agent/.env.example` to `agent/.env`, set `TELEGRAM_BOT_TOKEN` (from [@BotFather](https://t.me/BotFather) → `/newbot`)
    and `DID_LABEL` (the DID name from step 2).
